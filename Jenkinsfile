@@ -27,7 +27,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    bat "venv\\Scripts\\activate.bat && coverage run -m unittest discover"
+                    bat "venv\\Scripts\\activate.bat && coverage run -m unittest discover -s tests -p 'test_*.py'"
                 }
             }
         }
