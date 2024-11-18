@@ -23,6 +23,14 @@ pipeline {
                 }
             }
         }
+               
+        stage('Debug Workspace') {
+            steps {
+                script {
+                     bat "dir /s"
+                }
+            }
+        }
 
         stage('Test') {
             steps {
