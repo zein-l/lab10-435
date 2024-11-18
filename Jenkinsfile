@@ -2,17 +2,16 @@ pipeline {
     agent any
 
     environment {
-        VIRTUAL_ENV = 'venv'
+        PYTHON_HOME = 'C:\\Users\\Zeink\\AppData\\Local\\Programs\\Python\\Python312' // Adjust if your Python is in a different location
+        PATH = "${env.PYTHON_HOME};${env.PYTHON_HOME}\\Scripts;${env.PATH}"
     }
 
     stages {
         stage('Setup') {
             steps {
                 script {
-                    if (!fileExists("${env.WORKSPACE}\\${VIRTUAL_ENV}")) {
-                        bat "python -m venv ${VIRTUAL_ENV}"
-                    }
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && pip install -r requirements.txt"
+                    bat "${env.PYTHON_HOME}\\python -m venv venv"
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && pip install -r requirements.txt"
                 }
             }
         }
@@ -20,7 +19,7 @@ pipeline {
         stage('Lint') {
             steps {
                 script {
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && flake8 app.py"
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && flake8 app.py"
                 }
             }
         }
@@ -28,7 +27,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && coverage run -m unittest discover"
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && coverage run -m unittest discover"
                 }
             }
         }
@@ -36,13 +35,10 @@ pipeline {
         stage('Coverage') {
             steps {
                 script {
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && coverage report"
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && coverage html"
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && coverage report"
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && coverage html"
                 }
                 publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
                     reportDir: 'htmlcov',
                     reportFiles: 'index.html',
                     reportName: 'Coverage Report'
@@ -53,7 +49,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && bandit -r ."
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && bandit -r ."
                 }
             }
         }
@@ -62,7 +58,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application..."
-                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && python app.py"
+                    bat "${env.PYTHON_HOME}\\Scripts\\activate && python app.py"
                 }
             }
         }
