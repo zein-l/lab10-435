@@ -9,10 +9,10 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    if (!fileExists("${env.WORKSPACE}/${VIRTUAL_ENV}")) {
-                        sh "python -m venv ${VIRTUAL_ENV}"
+                    if (!fileExists("${env.WORKSPACE}\\${VIRTUAL_ENV}")) {
+                        bat "python -m venv ${VIRTUAL_ENV}"
                     }
-                    sh ". ${VIRTUAL_ENV}/bin/activate && pip install -r requirements.txt"
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && pip install -r requirements.txt"
                 }
             }
         }
@@ -20,7 +20,7 @@ pipeline {
         stage('Lint') {
             steps {
                 script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate && flake8 app.py"
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && flake8 app.py"
                 }
             }
         }
@@ -28,7 +28,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate && coverage run -m unittest discover"
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && coverage run -m unittest discover"
                 }
             }
         }
@@ -36,8 +36,8 @@ pipeline {
         stage('Coverage') {
             steps {
                 script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate && coverage report"
-                    sh ". ${VIRTUAL_ENV}/bin/activate && coverage html"
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && coverage report"
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && coverage html"
                 }
                 publishHTML(target: [
                     allowMissing: false,
@@ -53,7 +53,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate && bandit -r ."
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && bandit -r ."
                 }
             }
         }
@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application..."
-                    sh ". ${VIRTUAL_ENV}/bin/activate && python app.py"
+                    bat "${env.WORKSPACE}\\${VIRTUAL_ENV}\\Scripts\\activate && python app.py"
                 }
             }
         }
