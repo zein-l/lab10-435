@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_HOME = 'C:\\Users\\Zeink\\AppData\\Local\\Programs\\Python\\Python312' // Adjust if your Python is in a different location
+        PYTHON_HOME = 'C:\\Users\\Zeink\\AppData\\Local\\Programs\\Python\\Python312' // Adjust if your Python path is different
         PATH = "${env.PYTHON_HOME};${env.PYTHON_HOME}\\Scripts;${env.PATH}"
     }
 
@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     bat "${env.PYTHON_HOME}\\python -m venv venv"
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && pip install -r requirements.txt"
+                    bat "venv\\Scripts\\activate.bat && ${env.PYTHON_HOME}\\Scripts\\pip install -r requirements.txt"
                 }
             }
         }
@@ -19,7 +19,7 @@ pipeline {
         stage('Lint') {
             steps {
                 script {
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && flake8 app.py"
+                    bat "venv\\Scripts\\activate.bat && flake8 app.py"
                 }
             }
         }
@@ -27,7 +27,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && coverage run -m unittest discover"
+                    bat "venv\\Scripts\\activate.bat && coverage run -m unittest discover"
                 }
             }
         }
@@ -35,8 +35,8 @@ pipeline {
         stage('Coverage') {
             steps {
                 script {
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && coverage report"
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && coverage html"
+                    bat "venv\\Scripts\\activate.bat && coverage report"
+                    bat "venv\\Scripts\\activate.bat && coverage html"
                 }
                 publishHTML(target: [
                     reportDir: 'htmlcov',
@@ -49,7 +49,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && bandit -r ."
+                    bat "venv\\Scripts\\activate.bat && bandit -r ."
                 }
             }
         }
@@ -58,7 +58,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application..."
-                    bat "${env.PYTHON_HOME}\\Scripts\\activate && python app.py"
+                    bat "venv\\Scripts\\activate.bat && python app.py"
                 }
             }
         }
